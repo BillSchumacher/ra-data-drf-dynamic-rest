@@ -1,4 +1,9 @@
-# Changelog
+### 0.1.0 (2023-09-18)
+
+* first release (ra-data-drf-dynamic-rest), work in progress.
+
+
+# ra-data-django-rest-framework's Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 

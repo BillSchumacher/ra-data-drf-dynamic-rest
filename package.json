@@ -38,7 +38,12 @@
     "trailingComma": "es5"
   },
   "name": "ra-data-drf-dynamic-rest",
-  "author": "Bojan Mihelac",
+  "contributors": [
+    {
+      "name": "Bojan Mihelac"
+    }
+  ],
+  "author": "Bill Schumacher",
   "module": "dist/ra-data-drf-dynamic-rest.esm.js",
   "devDependencies": {
     "cross-fetch": "^3.0.5",
