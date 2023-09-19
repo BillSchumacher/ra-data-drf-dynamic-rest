@@ -131,6 +131,8 @@ Run server:
 ./manage.py runserver
 ```
 
+This Django app allows CORS from all origins this is not recommended in production.
+
 Admin credentials in the example app are:
 
 `admin`
