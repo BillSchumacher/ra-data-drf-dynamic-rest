@@ -1,11 +1,7 @@
-import json
-
-from django.contrib.auth.models import Group
-from rest_framework import authentication, permissions, serializers, viewsets
-
+from dynamic_rest.serializers import DynamicModelSerializer, DynamicRelationField
+from rest_framework.serializers import JSONField
+from dynamic_rest.viewsets import DynamicModelViewSet
 from exampleapp.models import Author, Comment, Post, Tag
-
-from . import filters
 
 
 def update_instance(instance, validated_data):
@@ -14,13 +10,13 @@ def update_instance(instance, validated_data):
     instance.save()
 
 
-class TagSerializer(serializers.ModelSerializer):
+class TagSerializer(DynamicModelSerializer):
     class Meta:
         model = Tag
         fields = ("id", "name", "parent", "published")
 
 
-class AuthorSerializer(serializers.ModelSerializer):
+class AuthorSerializer(DynamicModelSerializer):
     model = Author
 
     class Meta:
@@ -28,7 +24,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "email")
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(DynamicModelSerializer):
     author = AuthorSerializer(many=False)
 
     class Meta:
@@ -47,16 +43,17 @@ class CommentSerializer(serializers.ModelSerializer):
         return instance
 
 
-class TagRelatedField(serializers.PrimaryKeyRelatedField):
+class TagRelatedField(DynamicRelationField):
+
     def get_queryset(self):
         return super().get_queryset()
 
 
-class PostSerializer(serializers.ModelSerializer):
-    tags = TagRelatedField(many=True, queryset=Tag.objects.all(), required=False)
-    backlinks = serializers.JSONField(required=False)
-    notifications = serializers.JSONField(required=False)
-    authors = serializers.JSONField(required=False)
+class PostSerializer(DynamicModelSerializer):
+    tags = TagRelatedField(many=True, queryset=Tag.objects.all(), required=False, serializer_class = TagSerializer)
+    backlinks = JSONField(required=False)
+    notifications = JSONField(required=False)
+    authors = JSONField(required=False)
 
     class Meta:
         model = Post
@@ -78,27 +75,29 @@ class PostSerializer(serializers.ModelSerializer):
         )
 
 
-class TagViewSet(viewsets.ModelViewSet):
+class TagViewSet(DynamicModelViewSet):
+    model = Tag
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
 
 
-class PostViewSet(viewsets.ModelViewSet):
+class PostViewSet(DynamicModelViewSet):
+    model = Post
     queryset = Post.objects.all()
     serializer_class = PostSerializer
-    filterset_class = filters.PostFilter
     search_fields = ["title", "teaser", "body"]
 
 
-class CommentViewSet(viewsets.ModelViewSet):
+class CommentViewSet(DynamicModelViewSet):
+    model = Comment
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     filterset_fields = ["post"]
     search_fields = ["body"]
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class UserViewSet(DynamicModelViewSet):
+    model = Author
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    filterset_class = filters.UserFilterSet
     search_fields = ["name"]

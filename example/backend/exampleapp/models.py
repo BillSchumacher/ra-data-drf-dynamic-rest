@@ -1,5 +1,4 @@
 from django.db import models
-from jsonfield import JSONField
 
 
 class Author(models.Model):
@@ -34,17 +33,17 @@ class Post(models.Model):
     category = models.CharField("category", max_length=100, blank=True)
     subcategory = models.CharField("subcategory", max_length=100, blank=True)
     tags = models.ManyToManyField(Tag, verbose_name="tags", related_name="tags", blank=True)
-    backlinks = JSONField(
+    backlinks = models.JSONField(
         'backlinks',
         blank=True,
         default=list,
     )
-    notifications = JSONField(
+    notifications = models.JSONField(
         'notifications',
         blank=True,
         default=list,
     )
-    authors = JSONField(
+    authors = models.JSONField(
         'authors',
         blank=True,
         default=list,

@@ -1,12 +1,8 @@
-from django.conf import settings
-from rest_framework.routers import DefaultRouter, SimpleRouter
-
+from dynamic_rest.routers import DynamicRouter
 from exampleapp.api import TagViewSet, PostViewSet, CommentViewSet, UserViewSet
 
-if settings.DEBUG:
-    router = DefaultRouter()
-else:
-    router = SimpleRouter()
+
+router = DynamicRouter()
 
 router.register("tags", TagViewSet)
 router.register("posts", PostViewSet)
@@ -15,4 +11,3 @@ router.register("users", UserViewSet)
 
 
 app_name = "api"
-urlpatterns = router.urls

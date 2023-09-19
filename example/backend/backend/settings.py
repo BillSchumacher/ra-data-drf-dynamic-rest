@@ -37,9 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "django_filters",
     "rest_framework",
-    "rest_framework.authtoken",
+    "dynamic_rest",
     "exampleapp",
 ]
 
@@ -127,14 +126,8 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'exampleapp.pagination.PageNumberWithPageSizePagination',
     'PAGE_SIZE': 10,
-    'DEFAULT_FILTER_BACKENDS': [
-        'rest_framework.filters.OrderingFilter',
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # SessionAuthentication is intentionally removed, see:
-        # https://github.com/encode/django-rest-framework/issues/6104'
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
