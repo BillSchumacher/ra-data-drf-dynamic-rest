@@ -1,11 +1,11 @@
 import { stringify } from 'query-string';
 import {
-  Identifier,
-  Pagination,
-  Sort,
-  Filter,
   fetchUtils,
   DataProvider,
+  FilterPayload,
+  Identifier,
+  PaginationPayload,
+  SortPayload
 } from 'ra-core';
 
 export {
@@ -18,14 +18,14 @@ export {
   fetchJsonWithAuthJWTToken,
 } from './jwtTokenAuthProvider';
 
-const getPaginationQuery = (pagination: Pagination) => {
+const getPaginationQuery = (pagination: PaginationPayload) => {
   return {
     page: pagination.page,
     page_size: pagination.perPage,
   };
 };
 
-const getFilterQuery = (filter: Filter) => {
+const getFilterQuery = (filter: FilterPayload ) => {
   const { q: search, ...otherSearchParams } = filter;
   return {
     ...otherSearchParams,
@@ -33,7 +33,7 @@ const getFilterQuery = (filter: Filter) => {
   };
 };
 
-export const getOrderingQuery = (sort: Sort) => {
+export const getOrderingQuery = (sort: SortPayload) => {
   const { field, order } = sort;
   return {
     "sort[]": `${order === 'ASC' ? '' : '-'}${field}`,

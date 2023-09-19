@@ -1,4 +1,5 @@
 import DataProvider, { getOrderingQuery } from '../src';
+import {GetListParams, SortPayload} from "ra-core";
 
 const TEST_URL = 'http://example.com';
 const DEFAULT_PAGINATION = {
@@ -6,11 +7,11 @@ const DEFAULT_PAGINATION = {
   perPage: 10,
 };
 const DEFAULT_FILTER = {};
-const DEFAULT_ORDERING = {
+const DEFAULT_ORDERING : SortPayload = {
   field: 'id',
   order: 'ASC',
 };
-const DEFAULT_LIST_PARAMS = {
+const DEFAULT_LIST_PARAMS : GetListParams = {
   filter: DEFAULT_FILTER,
   sort: DEFAULT_ORDERING,
   pagination: DEFAULT_PAGINATION,
