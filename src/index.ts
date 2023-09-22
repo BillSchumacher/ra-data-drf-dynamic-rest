@@ -7,6 +7,7 @@ import {
   PaginationPayload,
   SortPayload
 } from 'ra-core';
+var inflection = require( 'inflection' );
 
 export {
   default as tokenAuthProvider,
@@ -61,7 +62,7 @@ export default (
       const { json } = await httpClient(url);
 
       return {
-        data: resource.endsWith('s') ? json[`${resource}`] : json[`${resource}s`],
+        data: json[inflection.pluralize(resource)],
         total: json.count,
       };
     },
@@ -69,7 +70,7 @@ export default (
     getOne: async (resource, params) => {
       const data = await getOneJson(resource, params.id);
       return {
-        data: resource.endsWith('s') ? data[`${resource}s`] : data[`${resource}`],
+        data: data[inflection.singularize(resource)],
       };
     },
 
@@ -90,7 +91,7 @@ export default (
 
       const { json } = await httpClient(url);
       return {
-        data:  resource.endsWith('s') ? json[`${resource}`] : json[`${resource}s`],
+        data:  json[inflection.pluralize(resource)],
         total: json.count,
       };
     },
@@ -100,7 +101,7 @@ export default (
         method: 'PATCH',
         body: JSON.stringify(params.data),
       });
-      return { data: json[`${resource}`] };
+      return { data: json[inflection.singularize(resource)] };
     },
 
     updateMany: (resource, params) =>
@@ -119,7 +120,7 @@ export default (
         body: JSON.stringify(params.data),
       });
       return {
-        data: { ...json[`${resource}`] },
+        data: { ...json[inflection.singularize(resource)] },
       };
     },
 
