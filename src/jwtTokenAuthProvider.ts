@@ -3,6 +3,9 @@ import { AuthProvider, fetchUtils } from 'ra-core';
 export interface Options {
   obtainAuthTokenUrl?: string;
 }
+export interface RefreshOptions {
+    refreshToken?: string;
+}
 
 function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
   const opts = {
@@ -19,8 +22,8 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
       const response = await fetch(request);
       if (response.ok) {
         const responseJSON = await response.json();
-        localStorage.setItem('access', responseJSON.access);
-        localStorage.setItem('refresh', responseJSON.refresh);
+        sessionStorage.setItem('access', responseJSON.access);
+        sessionStorage.setItem('refresh', responseJSON.refresh);
         return;
       }
       if (response.headers.get('content-type') !== 'application/json') {
@@ -32,17 +35,17 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
       throw new Error(error || response.statusText);
     },
     logout: () => {
-      localStorage.removeItem('access');
-      localStorage.removeItem('refresh');
+      sessionStorage.removeItem('access');
+      sessionStorage.removeItem('refresh');
       return Promise.resolve();
     },
     checkAuth: () =>
-      localStorage.getItem('access') ? Promise.resolve() : Promise.reject(),
+      sessionStorage.getItem('access') ? Promise.resolve() : Promise.reject(),
     checkError: error => {
       const status = error.status;
       if (status === 401 || status === 403) {
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
+        sessionStorage.removeItem('access');
+        sessionStorage.removeItem('refresh');
         return Promise.reject();
       }
       return Promise.resolve();
@@ -50,11 +53,31 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
     getPermissions: () => {
       return Promise.resolve();
     },
+    getRefreshToken: async ({refreshToken}: RefreshOptions) => {
+      const request = new Request(opts.obtainAuthTokenUrl + "refresh/", {
+        method: 'POST',
+        body: JSON.stringify({refresh: refreshToken}),
+        headers: new Headers({'Content-Type': 'application/json'}),
+      });
+      const response = await fetch(request);
+      if (response.ok) {
+        const responseJSON = await response.json();
+        sessionStorage.setItem('access', responseJSON.access);
+        return;
+      }
+      if (response.headers.get('content-type') !== 'application/json') {
+        throw new Error(response.statusText);
+      }
+
+      const json = await response.json();
+      const error = json.non_field_errors;
+      throw new Error(error || response.statusText);
+    }
   };
 }
 
 export function createOptionsFromJWTToken() {
-  const token = localStorage.getItem('access');
+  const token = sessionStorage.getItem('access');
   if (!token) {
     return {};
   }
