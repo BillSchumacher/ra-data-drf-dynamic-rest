@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/BillSchumacher/ra-data-drf-dynamic-rest/compare/v0.2.1...v0.2.2) (2023-12-07)
+
 ### [0.2.1](https://github.com/BillSchumacher/ra-data-drf-dynamic-rest/compare/v0.1.5...v0.2.1) (2023-12-06)
 
 ### [0.1.5](https://github.com/BillSchumacher/ra-data-drf-dynamic-rest/compare/v0.1.4...v0.1.5) (2023-09-22)
