@@ -1,15 +1,19 @@
 import { AuthProvider, fetchUtils } from 'ra-core';
 
+
 export interface Options {
   obtainAuthTokenUrl?: string;
-}
-export interface RefreshOptions {
-    refreshToken?: string;
+  refreshTokenUrl?: string;
 }
 
-function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
+interface RefreshAuthProvider extends AuthProvider {
+   refreshAccessToken: () => Promise<void>
+}
+
+function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
   const opts = {
     obtainAuthTokenUrl: '/api/token/',
+    refreshTokenUrl: '/api/token/refresh/',
     ...options,
   };
   return {
@@ -35,6 +39,7 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
       throw new Error(error || response.statusText);
     },
     logout: () => {
+      console.log("Logout");
       sessionStorage.removeItem('access');
       sessionStorage.removeItem('refresh');
       return Promise.resolve();
@@ -45,7 +50,6 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
       const status = error.status;
       if (status === 401 || status === 403) {
         sessionStorage.removeItem('access');
-        sessionStorage.removeItem('refresh');
         return Promise.reject();
       }
       return Promise.resolve();
@@ -53,8 +57,13 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
     getPermissions: () => {
       return Promise.resolve();
     },
-    getRefreshToken: async ({refreshToken}: RefreshOptions) => {
-      const request = new Request(opts.obtainAuthTokenUrl + "refresh/", {
+    refreshAccessToken: async () => {
+      const refreshToken = sessionStorage.getItem('refresh');
+      if (!refreshToken) {
+        throw new Error("No refresh token");
+      }
+
+      const request = new Request(opts.refreshTokenUrl, {
         method: 'POST',
         body: JSON.stringify({refresh: refreshToken}),
         headers: new Headers({'Content-Type': 'application/json'}),
@@ -63,6 +72,7 @@ function jwtTokenAuthProvider(options: Options = {}): AuthProvider {
       if (response.ok) {
         const responseJSON = await response.json();
         sessionStorage.setItem('access', responseJSON.access);
+        sessionStorage.setItem('refresh', refreshToken);
         return;
       }
       if (response.headers.get('content-type') !== 'application/json') {
