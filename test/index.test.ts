@@ -69,22 +69,22 @@ describe('dataProvider', () => {
     it('should return data', async () => {
       const { dataProvider } = mockDataProvider({
         posts: [item],
-        meta: {page: 1, total_results: 1, total_pages: 1},
+        meta: { page: 1, total_results: 1, total_pages: 1 },
       });
       expect(await dataProvider.getList('posts', DEFAULT_LIST_PARAMS)).toEqual({
         data: [item],
         total: 1,
         pageInfo: {
-            hasNextPage: false,
-            hasPreviousPage: false,
-        }
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
       });
     });
   });
 
   describe('getOne', function() {
     it('should return data', async () => {
-      const { dataProvider } = mockDataProvider({post: item});
+      const { dataProvider } = mockDataProvider({ post: item });
       expect(await dataProvider.getOne('posts', { id: item.id })).toEqual({
         data: item,
       });
@@ -93,7 +93,7 @@ describe('dataProvider', () => {
 
   describe('getMany', function() {
     it('should return data', async () => {
-      const { dataProvider } = mockDataProvider({post: item});
+      const { dataProvider } = mockDataProvider({ post: item });
       expect(await dataProvider.getMany('posts', { ids: [item.id] })).toEqual({
         data: [item],
       });
@@ -154,7 +154,7 @@ describe('dataProvider', () => {
 
   describe('create', function() {
     it('should return data', async () => {
-      const { dataProvider } = mockDataProvider({post: item});
+      const { dataProvider } = mockDataProvider({ post: item });
       expect(await dataProvider.create('posts', { data: item })).toEqual({
         data: item,
       });

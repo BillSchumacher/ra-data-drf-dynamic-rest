@@ -58,7 +58,7 @@ const getData = (json: any, resource: string) => {
 };
 
 const getPaginationData = (json: any) => {
-  const hasMeta = json.meta != undefined;
+  const hasMeta = json.meta !== undefined;
   return {
     total: json.results
       ? json.count > 0
@@ -70,10 +70,14 @@ const getPaginationData = (json: any) => {
     pageInfo: {
       hasNextPage: json.results
         ? json.next != null
-        : hasMeta ? json.meta.page < json.meta['total_pages'] : false,
+        : hasMeta
+        ? json.meta.page < json.meta['total_pages']
+        : false,
       hasPreviousPage: json.results
         ? json.previous != null
-        : hasMeta ? json.meta['total_pages'] - json.meta.page > 0 : false,
+        : hasMeta
+        ? json.meta['total_pages'] - json.meta.page > 0
+        : false,
     },
   };
 };
