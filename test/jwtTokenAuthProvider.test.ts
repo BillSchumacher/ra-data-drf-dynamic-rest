@@ -42,24 +42,24 @@ describe('login', () => {
       body: { access },
     });
     await jwtTokenAuthProvider().login(LOGIN_DATA);
-    expect(localStorage.getItem('access')).toBe(access);
+    expect(sessionStorage.getItem('access')).toBe(access);
   });
 });
 
 describe('logout', () => {
   it('should remove token', async () => {
-    localStorage.setItem('access', 'abcdef');
+    sessionStorage.setItem('access', 'abcdef');
     await jwtTokenAuthProvider().logout({});
   });
 });
 
 describe('checkAuth', () => {
   it('should return resolve when token exists', async () => {
-    localStorage.setItem('access', 'abcdef');
+    sessionStorage.setItem('access', 'abcdef');
     await expect(jwtTokenAuthProvider().checkAuth({})).resolves.toBeUndefined();
   });
   it('should return reject when token does not exists', async () => {
-    localStorage.clear();
+    sessionStorage.clear();
     await expect(jwtTokenAuthProvider().checkAuth({})).rejects.toBeUndefined();
   });
 });
@@ -85,7 +85,7 @@ describe('getPermissions', () => {
 
 describe('createOptionsFromJWTToken', () => {
   test('with token', () => {
-    localStorage.setItem('access', 'abcdef');
+    sessionStorage.setItem('access', 'abcdef');
     expect(createOptionsFromJWTToken()).toEqual({
       user: {
         authenticated: true,
@@ -95,7 +95,7 @@ describe('createOptionsFromJWTToken', () => {
   });
 
   test('without token', () => {
-    localStorage.clear();
+    sessionStorage.clear();
     expect(createOptionsFromJWTToken()).toEqual({});
   });
 });
