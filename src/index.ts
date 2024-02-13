@@ -99,9 +99,10 @@ export default (
     },
 
     getMany: async (resource, params) => {
-      const data = await Promise.all(
+      const results = await Promise.all(
           params.ids.map(id => getOneJson(resource, id))
       );
+      const data = results.map((json: any) => getData(json, resource));
       return ({data});
     },
 
