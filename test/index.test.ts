@@ -111,7 +111,7 @@ describe('dataProvider', () => {
         id: 4,
       });
       expect(httpClient).toHaveBeenCalledWith(
-        'http://example.com/posts/?id=4&page=1&page_size=10&sort%5B%5D=id'
+        'http://example.com/posts/?filter%7Bid%7D=4&page=1&page_size=10&sort%5B%5D=id'
       );
     });
   });

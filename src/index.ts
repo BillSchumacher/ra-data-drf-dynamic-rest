@@ -27,12 +27,16 @@ const getPaginationQuery = (pagination: PaginationPayload) => {
   };
 };
 
+interface Filter {
+  [key: string]: any;
+}
+
 const getFilterQuery = (filter: FilterPayload) => {
-  const { q: search, ...otherSearchParams } = filter;
-  return {
-    ...otherSearchParams,
-    search,
-  };
+  let filterParams: Filter = {};
+  for (const [key, value] of Object.entries(filter)) {
+    filterParams[`filter{${key}}`] = value;
+  }
+  return filterParams;
 };
 
 export const getOrderingQuery = (sort: SortPayload) => {
@@ -126,7 +130,7 @@ export default function dataProvider(
         ...getFilterQuery(params.filter),
         ...getPaginationQuery(params.pagination),
         ...getOrderingQuery(params.sort),
-        [params.target]: params.id,
+        [`filter{${params.target}}`]: params.id,
       };
       const url = `${apiUrl}/${resource}/?${stringify(query)}`;
       const { json } = await httpClient(url);

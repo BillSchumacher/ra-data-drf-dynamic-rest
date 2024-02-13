@@ -38,7 +38,6 @@ function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
       throw new Error(error || response.statusText);
     },
     logout: () => {
-      console.log('Logout');
       sessionStorage.removeItem('access');
       sessionStorage.removeItem('refresh');
       return Promise.resolve();
