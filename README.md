@@ -157,6 +157,7 @@ Then, in your App.js file, setup the dataProvider like so:
 
 ```javascript
 import drfProvider, { fetchJsonWithAuthJWTToken } from 'ra-data-django-rest-framework';
+import { authProvider, refreshAuth } from "./authProvider";
 
 const authProvider = jwtTokenAuthProvider()
 const dataProvider = drfProvider("/api", fetchJsonWithAuthJWTToken);
