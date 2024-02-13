@@ -6,9 +6,9 @@ import {
   Identifier,
   PaginationPayload,
   SortPayload,
-  GetListResult
+  GetListResult,
 } from 'ra-core';
-import {singularize, pluralize} from 'inflection';
+import { singularize, pluralize } from 'inflection';
 
 export {
   default as tokenAuthProvider,
@@ -27,7 +27,7 @@ const getPaginationQuery = (pagination: PaginationPayload) => {
   };
 };
 
-const getFilterQuery = (filter: FilterPayload ) => {
+const getFilterQuery = (filter: FilterPayload) => {
   const { q: search, ...otherSearchParams } = filter;
   return {
     ...otherSearchParams,
@@ -38,7 +38,7 @@ const getFilterQuery = (filter: FilterPayload ) => {
 export const getOrderingQuery = (sort: SortPayload) => {
   const { field, order } = sort;
   return {
-    "sort[]": `${order === 'ASC' ? '' : '-'}${field}`,
+    'sort[]': `${order === 'ASC' ? '' : '-'}${field}`,
   };
 };
 
@@ -55,39 +55,49 @@ const getData = (json: any, resource: string) => {
     return data[plural_resource];
   }
   return null;
-}
+};
 
 const getPaginationData = (json: any) => {
   return {
-    total: json.results ? json.count > 0 ? json.count : -1 : json.meta ? json.meta["total_results"] : null,
+    total: json.results
+      ? json.count > 0
+        ? json.count
+        : -1
+      : json.meta
+      ? json.meta['total_results']
+      : null,
     pageInfo: {
-      hasNextPage: json.results ? json.next != null : json.meta.page < json.meta["total_pages"],
-      hasPreviousPage: json.results ? json.previous != null : json.meta["total_pages"] - json.meta.page > 0,
-    }
-  }
+      hasNextPage: json.results
+        ? json.next != null
+        : json.meta.page < json.meta['total_pages'],
+      hasPreviousPage: json.results
+        ? json.previous != null
+        : json.meta['total_pages'] - json.meta.page > 0,
+    },
+  };
 };
 
-export default (
+export default function dataProvider(
   apiUrl: String,
   httpClient: Function = fetchUtils.fetchJson
-): DataProvider => {
+): DataProvider {
   const getOneJson = (resource: String, id: Identifier) =>
     httpClient(`${apiUrl}/${resource}/${id}/`).then(
       (response: Response) => response.json
     );
 
   return {
-    getList: async (resource, params):Promise<GetListResult<any>> => {
+    getList: async (resource, params): Promise<GetListResult<any>> => {
       const query = {
         ...getFilterQuery(params.filter),
         ...getPaginationQuery(params.pagination),
         ...getOrderingQuery(params.sort),
       };
       const url = `${apiUrl}/${resource}/?${stringify(query)}`;
-      const {json} = await httpClient(url);
+      const { json } = await httpClient(url);
       return {
         data: getData(json, resource),
-        ...getPaginationData(json)
+        ...getPaginationData(json),
       };
     },
 
@@ -100,10 +110,10 @@ export default (
 
     getMany: async (resource, params) => {
       const results = await Promise.all(
-          params.ids.map(id => getOneJson(resource, id))
+        params.ids.map(id => getOneJson(resource, id))
       );
       const data = results.map((json: any) => getData(json, resource));
-      return ({data});
+      return { data };
     },
 
     getManyReference: async (resource, params) => {
@@ -117,7 +127,7 @@ export default (
       const { json } = await httpClient(url);
       return {
         data: getData(json, resource),
-        ...getPaginationData(json)
+        ...getPaginationData(json),
       };
     },
 
@@ -163,4 +173,4 @@ export default (
         )
       ).then(() => ({ data: [] })),
   };
-};
+}

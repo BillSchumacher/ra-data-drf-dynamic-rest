@@ -1,13 +1,12 @@
 import { AuthProvider, fetchUtils } from 'ra-core';
 
-
 export interface Options {
   obtainAuthTokenUrl?: string;
   refreshTokenUrl?: string;
 }
 
 interface RefreshAuthProvider extends AuthProvider {
-   refreshAccessToken: () => Promise<void>
+  refreshAccessToken: () => Promise<void>;
 }
 
 function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
@@ -39,7 +38,7 @@ function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
       throw new Error(error || response.statusText);
     },
     logout: () => {
-      console.log("Logout");
+      console.log('Logout');
       sessionStorage.removeItem('access');
       sessionStorage.removeItem('refresh');
       return Promise.resolve();
@@ -60,13 +59,13 @@ function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
     refreshAccessToken: async () => {
       const refreshToken = sessionStorage.getItem('refresh');
       if (!refreshToken) {
-        throw new Error("No refresh token");
+        throw new Error('No refresh token');
       }
 
       const request = new Request(opts.refreshTokenUrl, {
         method: 'POST',
-        body: JSON.stringify({refresh: refreshToken}),
-        headers: new Headers({'Content-Type': 'application/json'}),
+        body: JSON.stringify({ refresh: refreshToken }),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
       });
       const response = await fetch(request);
       if (response.ok) {
@@ -82,7 +81,7 @@ function jwtTokenAuthProvider(options: Options = {}): RefreshAuthProvider {
       const json = await response.json();
       const error = json.non_field_errors;
       throw new Error(error || response.statusText);
-    }
+    },
   };
 }
 
