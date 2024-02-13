@@ -156,7 +156,7 @@ export const authProvider = addRefreshAuthToAuthProvider(jwtAuthProvider, refres
 Then, in your App.js file, setup the dataProvider like so:
 
 ```javascript
-import drfProvider, { fetchJsonWithAuthJWTToken } from 'ra-data-django-rest-framework';
+import drfProvider, { fetchJsonWithAuthJWTToken } from 'ra-data-drf-dynamic-rest';
 import { authProvider, refreshAuth } from "./authProvider";
 
 const authProvider = jwtTokenAuthProvider()
