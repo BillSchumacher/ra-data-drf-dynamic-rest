@@ -1,5 +1,9 @@
 # ra-data-drf-dynamic-rest
 
+Some of the info here is pretty outdated, personally I would recommend using JWT authentication with this library, the token auth is neglected and not tested.
+
+As I have more time I'll update the examples and the documentation.
+
 Original project:
 https://github.com/bmihelac/ra-data-django-rest-framework
 
@@ -95,20 +99,79 @@ const dataProvider = drfProvider("/api", fetchJsonWithAuthToken);
 
 `jwtTokenAuthProvider` uses
 [JSON Web Token Authentication](https://www.django-rest-framework.org/api-guide/authentication/#json-web-token-authentication)
-to obtain token from django-rest-framework. User token is saved in `localStorage`.
+to obtain token from django-rest-framework. User token is saved in `sessionStorage`.
 
-`jwtTokenAuthProvider` accepts options as second argument with
-`obtainAuthJWTTokenUrl` key. Default URL for obtaining a token is `/api/token/`.
+`jwtTokenAuthProvider` accepts options as arguments:
+
+`obtainAuthJWTTokenUrl` -  Default URL for obtaining a token is `/api/token/`
+
+`refreshTokenUrl` - Default URL for refreshing an access token is `/api/token/refresh/`
 
 `fetchJsonWithAuthJWTToken` overrides *httpClient* and adds authorization header
 with previously saved user token to every request.
 
-```javascrtipt
-import drfProvider, { jwtTokenAuthProvider, fetchJsonWithAuthJWTToken } from 'ra-data-django-rest-framework';
+For the refresh token to work properly, you need to use `addRefreshTokenToAuthProvider` and `addRefreshTokenToDataProvider`.
+
+To keep things organized, create an authProvider.js file and populate it like so:
+
+```javascript
+import { addRefreshAuthToAuthProvider } from 'react-admin';
+import { jwtTokenAuthProvider } from "ra-data-drf-dynamic-rest";
+
+const API_BASE_URL = 'http://localhost:8000';
+
+const jwtAuthProvider = jwtTokenAuthProvider({
+    obtainAuthTokenUrl: `${API_BASE_URL}/api/token/` ,
+    refreshTokenUrl: `${API_BASE_URL}/api/token/refresh/`,
+});
+
+export const getAuthTokensFromSessionStorage = () => {
+       const access = sessionStorage.getItem('access');
+       const refresh = sessionStorage.getItem('refresh');
+       return {access, refresh};
+}
+
+function parseJwt (token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+export const refreshAuth = () => {
+    const { access, refresh } = getAuthTokensFromSessionStorage();
+    const now = new Date();
+    const claims = parseJwt(access);
+    if (claims.exp < now.getTime() / 1000 && refresh) {
+        return jwtAuthProvider.refreshAccessToken();
+    }
+    return Promise.resolve();
+}
+
+export const authProvider = addRefreshAuthToAuthProvider(jwtAuthProvider, refreshAuth);
+```
+
+Then, in your App.js file, setup the dataProvider like so:
+
+```javascript
+import drfProvider, { fetchJsonWithAuthJWTToken } from 'ra-data-django-rest-framework';
 
 const authProvider = jwtTokenAuthProvider()
 const dataProvider = drfProvider("/api", fetchJsonWithAuthJWTToken);
+
+const API_BASE_URL = 'http://localhost:8000';
+
+
+const dataProvider : DataProvider = addRefreshAuthToDataProvider(drfProvider(`${API_BASE_URL}/api`, fetchJsonWithAuthJWTToken), refreshAuth)
+
+export const App = () => <Admin dataProvider={dataProvider} authProvider={authProvider}>
+        ...
+    </Admin>
 ```
+
+You probably want to do something a bit better with your API_BASE_URL...
 
 ## Example app
 
